@@ -1,4 +1,4 @@
-# dotfiles installer
+# dotfile installer
 
 ## Installation & Usage
 
