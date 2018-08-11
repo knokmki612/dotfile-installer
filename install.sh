@@ -71,6 +71,16 @@ xargs -0 mkdir -p
 IFS='
 '
 
+for dotdir in $(echo "$gitmodules" | grep -v 'dotfile-installer')
+do
+	target="$DOTFILES_DIR/$dotdir"
+	link_name="$HOME/.$dotdir"
+	entity=$(readlink "$link_name")
+	[ "$target" = "$entity" ] && continue # already linked
+	[ -d "$link_name" ] && continue # not yet linked but dir already exists
+	ln -nsv "$target" "$link_name" # not yet linked and dir no exists
+done
+
 dialog() {
 	ln -isv "$target" "$link_name"
 	[ "$target" = "$(readlink "$link_name")" ] || {
