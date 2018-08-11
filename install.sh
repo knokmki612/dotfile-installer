@@ -78,7 +78,7 @@ dialog() {
 	}
 }
 
-for dotfile in $(echo "$dotfiles")
+for dotfile in $dotfiles
 do
 	target="$DOTFILES_DIR/${dotfile#./}"
 	link_name="$HOME/.${dotfile#./}"
