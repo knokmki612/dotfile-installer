@@ -93,5 +93,5 @@ do
 		dialog
 		continue
 	}
-	ln -fsv "$target" "$link_name" # not yet linked and file no exists
+	ln -sv "$target" "$link_name" # not yet linked and file no exists
 done
