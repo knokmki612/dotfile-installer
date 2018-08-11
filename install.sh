@@ -22,8 +22,8 @@ append() {
 	+
 }
 
-DOTFILES=$(cd "$(dirname "$0")" && pwd)
-cd "$DOTFILES" || exit
+DOTFILES_DIR=$(cd "$(dirname "$0")" && pwd)
+cd "$DOTFILES_DIR" || exit
 
 gitmodules=$(grep 'path' .gitmodules | cut -d ' ' -f 3-)
 ignores="$gitmodules"
@@ -44,12 +44,12 @@ ignore_patterns=$(
 	}'
 )
 
-targets=$(
+dotfiles=$(
 	find . -type f |
 	awk "$ignore_patterns { print \$0 }"
 )
 link_dirs=$(
-	echo "$targets"      |
+	echo "$dotfiles"     |
 	awk -v home="$HOME" '{
 		sub(/^\.\//, home "/.")
 		print $0
@@ -67,7 +67,9 @@ xargs -0 mkdir -p
 IFS='
 '
 
-for target in $(echo "$targets")
+for dotfile in $(echo "$dotfiles")
 do
-	ln -fsv "$DOTFILES/${target#./}" "$HOME/.${target#./}"
+	target="$DOTFILES_DIR/${dotfile#./}"
+	link_name="$HOME/.${dotfile#./}"
+	ln -fsv "$target" "$link_name"
 done
