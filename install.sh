@@ -71,5 +71,16 @@ for dotfile in $(echo "$dotfiles")
 do
 	target="$DOTFILES_DIR/${dotfile#./}"
 	link_name="$HOME/.${dotfile#./}"
-	ln -fsv "$target" "$link_name"
+	entity=$(readlink "$link_name")
+	[ "$target" = "$entity" ] && continue # already linked
+	[ -n "$entity" ] && [ ! -f "$entity" ] && { # broken symlink
+		ln -isv "$target" "$link_name"
+		continue
+	}
+	[ -f "$link_name" ] && { # not yet linked but file already exists
+		diff -su "$link_name" "$target"
+		ln -isv "$target" "$link_name"
+		continue
+	}
+	ln -fsv "$target" "$link_name" # not yet linked and file no exists
 done
