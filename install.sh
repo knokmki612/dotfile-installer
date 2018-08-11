@@ -24,6 +24,7 @@ append() {
 
 DOTFILES_DIR=$(cd "$(dirname "$0")" && pwd)
 cd "$DOTFILES_DIR" || exit
+DOTFILES_IGNORE="$HOME/.dotfileignore"
 
 gitmodules=$(grep 'path' .gitmodules | cut -d ' ' -f 3-)
 ignores="$gitmodules"
@@ -31,6 +32,9 @@ ignores=$(append "$ignores" ".git")
 ignores=$(append "$ignores" "$(basename "$0")")
 ignores=$(append "$ignores" "LICENSE")
 ignores=$(append "$ignores" "README")
+[ -f "$DOTFILES_IGNORE" ] && {
+	ignores=$(append "$ignores" "$(cat "$DOTFILES_IGNORE")")
+}
 
 ignore_patterns=$(
 	echo "$ignores" |
@@ -67,6 +71,13 @@ xargs -0 mkdir -p
 IFS='
 '
 
+dialog() {
+	ln -isv "$target" "$link_name"
+	[ "$target" = "$(readlink "$link_name")" ] || {
+		echo "${dotfile#./}" >> "$DOTFILES_IGNORE"
+	}
+}
+
 for dotfile in $(echo "$dotfiles")
 do
 	target="$DOTFILES_DIR/${dotfile#./}"
@@ -74,12 +85,12 @@ do
 	entity=$(readlink "$link_name")
 	[ "$target" = "$entity" ] && continue # already linked
 	[ -n "$entity" ] && [ ! -f "$entity" ] && { # broken symlink
-		ln -isv "$target" "$link_name"
+		dialog
 		continue
 	}
 	[ -f "$link_name" ] && { # not yet linked but file already exists
 		diff -su "$link_name" "$target"
-		ln -isv "$target" "$link_name"
+		dialog
 		continue
 	}
 	ln -fsv "$target" "$link_name" # not yet linked and file no exists
