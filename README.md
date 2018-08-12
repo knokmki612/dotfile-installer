@@ -4,7 +4,7 @@
 
 ```
 $ cd dotfiles
-$ git submodule add https://github.com/knokmki612/dotfile-installer.git dotfile-installer
+$ git submodule add https://github.com/knokmki612/dotfile-installer.git
 $ ln -s dotfile-installer/install.sh .
 $ ./install.sh
 ```
