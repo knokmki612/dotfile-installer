@@ -105,3 +105,13 @@ do
 	}
 	ln -sv "$target" "$link_name" # not yet linked and file no exists
 done
+
+DOTFILES_HOOK=".git/hooks/post-merge"
+[ ! -f "$DOTFILES_HOOK" ] && {
+	cat <<- + > "$DOTFILES_HOOK"
+		#!/bin/sh
+
+		./install.sh
+	+
+	chmod 755 "$DOTFILES_HOOK"
+}
