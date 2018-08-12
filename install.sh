@@ -49,7 +49,7 @@ ignore_patterns=$(
 )
 
 dotfiles=$(
-	find . -type f |
+	find -L . -type f |
 	awk "$ignore_patterns { print \$0 }"
 )
 link_dirs=$(
