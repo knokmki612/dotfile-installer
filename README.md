@@ -4,7 +4,7 @@
 
 dotfile-installer helps your dotfiles management. This software focuses no learning cost is required to start using and there is no need to write the setting. All you need is just exec `./install.sh`.
 
-Example dotfiles repository: https://github.com/knokmki612/dotfile-installer
+Example dotfiles repository: https://github.com/knokmki612/dotfiles
 
 ## Essential points
 
