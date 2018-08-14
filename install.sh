@@ -15,26 +15,18 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 LICENSE
 
-append() {
-	cat <<- +
-		$1
-		$2
-	+
-}
-
 DOTFILES_DIR=$(cd "$(dirname "$0")" && pwd)
 cd "$DOTFILES_DIR" || exit
 DOTFILES_IGNORE="$HOME/.dotfileignore"
 
 gitmodules=$(grep 'path' .gitmodules | cut -d ' ' -f 3-)
-ignores="$gitmodules"
-ignores=$(append "$ignores" ".git")
-ignores=$(append "$ignores" "$(basename "$0")")
-ignores=$(append "$ignores" "LICENSE")
-ignores=$(append "$ignores" "README")
-[ -f "$DOTFILES_IGNORE" ] && {
-	ignores=$(append "$ignores" "$(cat "$DOTFILES_IGNORE")")
-}
+ignores="$gitmodules
+.git
+$(basename "$0")
+LICENSE
+README"
+[ -f "$DOTFILES_IGNORE" ] && ignores="$ignores
+$(cat "$DOTFILES_IGNORE")"
 
 ignore_patterns=$(
 	echo "$ignores" |
