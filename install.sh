@@ -41,8 +41,9 @@ ignore_patterns=$(
 )
 
 dotfiles=$(
-	find -L . -type f |
-	awk "$ignore_patterns { print \$0 }"
+	find -L . -type f                    |
+	awk "$ignore_patterns { print \$0 }" |
+	cut -d '/' -f 2-
 )
 link_dirs=$(
 	echo "$dotfiles"     |
@@ -76,14 +77,14 @@ done
 dialog() {
 	ln -isv "$target" "$link_name"
 	[ "$target" = "$(readlink "$link_name")" ] || {
-		echo "${dotfile#./}" >> "$DOTFILES_IGNORE"
+		echo "$dotfile" >> "$DOTFILES_IGNORE"
 	}
 }
 
 for dotfile in $dotfiles
 do
-	target="$DOTFILES_DIR/${dotfile#./}"
-	link_name="$HOME/.${dotfile#./}"
+	target="$DOTFILES_DIR/$dotfile"
+	link_name="$HOME/.$dotfile"
 	entity=$(readlink "$link_name")
 	[ "$target" = "$entity" ] && continue # already linked
 	[ -n "$entity" ] && [ ! -f "$entity" ] && { # broken symlink
