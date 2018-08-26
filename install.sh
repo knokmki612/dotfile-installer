@@ -70,6 +70,10 @@ do
 	link_name="$HOME/.$dotdir"
 	entity=$(readlink "$link_name")
 	[ "$target" = "$entity" ] && continue # already linked
+	[ -L "$link_name" ] && [ ! -d "$entity" ] && { # broken symlink
+		ln -fnsv "$target" "$link_name"
+		continue
+	}
 	[ -d "$link_name" ] && continue # not yet linked but dir already exists
 	ln -nsv "$target" "$link_name" # not yet linked and dir no exists
 done
@@ -87,7 +91,7 @@ do
 	link_name="$HOME/.$dotfile"
 	entity=$(readlink "$link_name")
 	[ "$target" = "$entity" ] && continue # already linked
-	[ -n "$entity" ] && [ ! -f "$entity" ] && { # broken symlink
+	[ -L "$link_name" ] && [ ! -f "$entity" ] && { # broken symlink
 		dialog
 		continue
 	}
