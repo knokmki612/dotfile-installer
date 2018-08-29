@@ -60,20 +60,16 @@ dotdirs=$(
 dots="$dotdirs
 $dotfiles"
 
-link_dirs=$(
-	echo "$dots"         |
-	awk -v home="$HOME" '{
-		sub(/^/, home "/.")
-		print $0
-	}'                   |
-	tr '\n' '\0'         |
-	xargs -0 -n1 dirname |
-	grep -v "$HOME$"     |
-	uniq
-)
-
-echo "$link_dirs" |
-tr '\n' '\0'      |
+echo "$dots"         |
+awk -v home="$HOME" '{
+	sub(/^/, home "/.")
+	print $0
+}'                   |
+tr '\n' '\0'         |
+xargs -0 -n1 dirname |
+grep -v "$HOME$"     |
+uniq                 |
+tr '\n' '\0'         |
 xargs -0 mkdir -p
 
 IFS='
