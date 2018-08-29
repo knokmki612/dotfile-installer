@@ -29,28 +29,39 @@ ignores="$GITMODULES
 $(basename "$0")
 LICENSE
 README"
-[ -f "$DOTFILES_IGNOREFILE" ] && ignores="$ignores
-$(cat "$DOTFILES_IGNOREFILE")"
+[ -f "$DOTFILES_IGNOREFILE" ] && {
+	ignores_from_ignorefile="$(cat "$DOTFILES_IGNOREFILE")"
+	ignores=$(printf '%s\n%s' "$ignores" "$ignores_from_ignorefile")
+}
 
-ignore_patterns=$(
-	echo "$ignores" |
+generate_ignore_patterns() {
+	[ -z "$1" ] && return
+	echo "$1" |
 	awk '{
 		gsub(/[. \/]/, "\\\\&")
-		print "!/^\\.\\/" $0 "/"
-	}'              |
-	awk -v final="$(echo "$ignores" | wc -l)" '{
+		print "!/^" $0 "/"
+	}'        |
+	awk -v final="$(echo "$1" | wc -l)" '{
 		if (NR!=final) sub(/$/, " \\&\\& \\")
 		print $0
 	}'
-)
+}
 
 dotfiles=$(
-	find -L . -type f                    |
-	awk "$ignore_patterns { print \$0 }" |
-	cut -d '/' -f 2-
+	find -L . -type f |
+	cut -d '/' -f 2-  |
+	awk "$(generate_ignore_patterns "$ignores") { print \$0 }"
 )
+dotdirs=$(
+	echo "$GITMODULES"     |
+	grep -v "$SELF_MODULE" |
+	awk "$(generate_ignore_patterns "$ignores_from_ignorefile") { print \$0 }"
+)
+dots="$dotdirs
+$dotfiles"
+
 link_dirs=$(
-	echo "$dotfiles"     |
+	echo "$dots"         |
 	awk -v home="$HOME" '{
 		sub(/^\.\//, home "/.")
 		print $0
@@ -68,34 +79,21 @@ xargs -0 mkdir -p
 IFS='
 '
 
-for dotdir in $(echo "$gitmodules" | grep -v 'dotfile-installer')
-do
-	target="$DOTFILES_DIR/$dotdir"
-	link_name="$HOME/.$dotdir"
-	entity=$(readlink "$link_name")
-	[ "$target" = "$entity" ] && continue # already linked
-	[ -L "$link_name" ] && [ ! -d "$entity" ] && { # broken symlink
-		ln -fnsv "$target" "$link_name"
-		continue
-	}
-	[ -d "$link_name" ] && continue # not yet linked but dir already exists
-	ln -nsv "$target" "$link_name" # not yet linked and dir no exists
-done
-
 dialog() {
-	ln -isv "$target" "$link_name"
+	ln -insv "$target" "$link_name"
 	[ "$target" = "$(readlink "$link_name")" ] || {
-		echo "$dotfile" >> "$DOTFILES_IGNOREFILE"
+		echo "$dot" >> "$DOTFILES_IGNOREFILE"
 	}
 }
 
-for dotfile in $dotfiles
+for dot in $dots
 do
-	target="$DOTFILES_DIR/$dotfile"
-	link_name="$HOME/.$dotfile"
+	target="$DOTFILES_DIR/$dot"
+	link_name="$HOME/.$dot"
 	entity=$(readlink "$link_name")
 	[ "$target" = "$entity" ] && continue # already linked
-	[ -L "$link_name" ] && [ ! -f "$entity" ] && { # broken symlink
+	[ -L "$link_name" ] && ([ ! -f "$entity" ] || [ ! -d "$entity" ]) && {
+		# broken symlink
 		dialog
 		continue
 	}
@@ -104,7 +102,8 @@ do
 		dialog
 		continue
 	}
-	ln -sv "$target" "$link_name" # not yet linked and file no exists
+	[ -d "$link_name" ] && continue # not yet linked but dir already exists
+	ln -nsv "$target" "$link_name" # not yet linked and no exists
 done
 
 DOTFILES_HOOK=".git/hooks/post-merge"
