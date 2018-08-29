@@ -17,16 +17,17 @@ LICENSE
 
 DOTFILES_DIR=$(cd "$(dirname "$0")" && pwd)
 cd "$DOTFILES_DIR" || exit
-DOTFILES_IGNORE="$HOME/.dotfileignore"
+DOTFILES_IGNOREFILE="$HOME/.dotfileignore"
 
-gitmodules=$(grep 'path' .gitmodules | cut -d ' ' -f 3-)
-ignores="$gitmodules
+GITMODULES=$(grep 'path' .gitmodules | cut -d ' ' -f 3-)
+
+ignores="$GITMODULES
 .git
 $(basename "$0")
 LICENSE
 README"
-[ -f "$DOTFILES_IGNORE" ] && ignores="$ignores
-$(cat "$DOTFILES_IGNORE")"
+[ -f "$DOTFILES_IGNOREFILE" ] && ignores="$ignores
+$(cat "$DOTFILES_IGNOREFILE")"
 
 ignore_patterns=$(
 	echo "$ignores" |
@@ -81,7 +82,7 @@ done
 dialog() {
 	ln -isv "$target" "$link_name"
 	[ "$target" = "$(readlink "$link_name")" ] || {
-		echo "$dotfile" >> "$DOTFILES_IGNORE"
+		echo "$dotfile" >> "$DOTFILES_IGNOREFILE"
 	}
 }
 
