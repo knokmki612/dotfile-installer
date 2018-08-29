@@ -63,7 +63,7 @@ $dotfiles"
 link_dirs=$(
 	echo "$dots"         |
 	awk -v home="$HOME" '{
-		sub(/^\.\//, home "/.")
+		sub(/^/, home "/.")
 		print $0
 	}'                   |
 	tr '\n' '\0'         |
