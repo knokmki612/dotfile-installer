@@ -15,6 +15,8 @@
 	along with this program.  If not, see <https://www.gnu.org/licenses/>.
 LICENSE
 
+echo 'dotfile-installer 1.1.0'
+
 DOTFILES_DIR=$(cd "$(dirname "$0")" && pwd)
 cd "$DOTFILES_DIR" || exit
 DOTFILES_IGNOREFILE="$HOME/.dotfileignore"
