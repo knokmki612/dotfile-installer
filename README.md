@@ -13,7 +13,6 @@ Example dotfiles repository: https://github.com/knokmki612/dotfiles
 * Please deploy your dotfiles with rename no dot to your dotfiles repository. dotfile-installer will link files with adding dot prefix. (ex. `cp ~/.bash_profile dotfiles/bash_profile`)
 * dotfile-installer supports gitmodule directory linking as same as other dotfile. You can separate config as gitmodule of  Emacs, Vim, other high independency software.
 * If you want to ignore some local dotfiles, dotfile-installer will add to ~/.dotfileignore. You can choose what you want to manage in dotfiles repository and each environment.
-* dotfile-installer automatically installs git-hook script. hook will works at `git pull`
 
 ## Installation & Usage
 

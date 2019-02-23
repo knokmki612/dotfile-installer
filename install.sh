@@ -103,13 +103,3 @@ do
 	[ -d "$link_name" ] && continue # not yet linked but dir already exists
 	ln -nsv "$target" "$link_name" # not yet linked and no exists
 done
-
-DOTFILES_HOOK=".git/hooks/post-merge"
-[ ! -f "$DOTFILES_HOOK" ] && {
-	cat <<- + > "$DOTFILES_HOOK"
-		#!/bin/sh
-
-		./install.sh
-	+
-	chmod 755 "$DOTFILES_HOOK"
-}
