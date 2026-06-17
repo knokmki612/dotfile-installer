@@ -1,0 +1,19 @@
+name: shfmt
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shfmt:
+    name: Check shell script formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run shfmt
+        uses: mfinelli/setup-shfmt@v3
+
+      - name: Check formatting
+        run: shfmt -d install.sh
