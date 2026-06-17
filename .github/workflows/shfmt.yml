@@ -4,13 +4,12 @@ on:
   push:
   pull_request:
 
-permissions:
-  contents: write
-
 jobs:
   shfmt:
     name: Format shell scripts
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,6 +30,12 @@ jobs:
         run: shfmt -w install.sh
 
       - name: Commit formatting changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: Apply shfmt formatting
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No formatting changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Apply shfmt formatting"
+          git push
