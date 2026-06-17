@@ -90,7 +90,7 @@ do
 	link_name="$HOME/.$dot"
 	entity=$(readlink "$link_name")
 	[ "$target" = "$entity" ] && continue # already linked
-	[ -L "$link_name" ] && ([ ! -f "$entity" ] || [ ! -d "$entity" ]) && {
+	[ -L "$link_name" ] && { [ ! -f "$entity" ] || [ ! -d "$entity" ]; } && {
 		# broken symlink
 		dialog
 		continue
