@@ -1,0 +1,41 @@
+name: shfmt
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shfmt:
+    name: Format shell scripts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup shfmt
+        env:
+          SHFMT_VERSION: v3.10.0
+          SHFMT_SHA256: 1f57a384d59542f8fac5f503da1f3ea44242f46dff969569e80b524d64b71dbc
+        run: |
+          curl -fsSL -o /usr/local/bin/shfmt \
+            "https://github.com/mvdan/sh/releases/download/${SHFMT_VERSION}/shfmt_${SHFMT_VERSION}_linux_amd64"
+          echo "${SHFMT_SHA256}  /usr/local/bin/shfmt" | sha256sum -c -
+          chmod +x /usr/local/bin/shfmt
+
+      - name: Run shfmt
+        run: shfmt -w install.sh
+
+      - name: Commit formatting changes
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No formatting changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Apply shfmt formatting"
+          git push

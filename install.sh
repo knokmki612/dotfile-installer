@@ -1,5 +1,5 @@
 #!/bin/sh
-: <<- LICENSE
+: <<-LICENSE
 	Copyright 2018 knokmki612
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -39,11 +39,11 @@ README"
 generate_ignore_patterns() {
 	[ -z "$1" ] && return
 	echo "$1" |
-	awk '{
+		awk '{
 		gsub(/[. \/]/, "\\\\&")
 		print "!/^" $0 "/"
-	}'        |
-	awk -v final="$(echo "$1" | wc -l)" '{
+	}' |
+		awk -v final="$(echo "$1" | wc -l)" '{
 		if (NR!=final) sub(/$/, " \\&\\& \\")
 		print $0
 	}'
@@ -51,28 +51,28 @@ generate_ignore_patterns() {
 
 dotfiles=$(
 	find -L . -type f |
-	cut -d '/' -f 2-  |
-	awk "$(generate_ignore_patterns "$ignores") { print \$0 }"
+		cut -d '/' -f 2- |
+		awk "$(generate_ignore_patterns "$ignores") { print \$0 }"
 )
 dotdirs=$(
-	echo "$GITMODULES"     |
-	grep -v "$SELF_MODULE" |
-	awk "$(generate_ignore_patterns "$ignores_from_ignorefile") { print \$0 }"
+	echo "$GITMODULES" |
+		grep -v "$SELF_MODULE" |
+		awk "$(generate_ignore_patterns "$ignores_from_ignorefile") { print \$0 }"
 )
 dots="$dotdirs
 $dotfiles"
 
-echo "$dots"         |
-awk -v home="$HOME" '{
+echo "$dots" |
+	awk -v home="$HOME" '{
 	sub(/^/, home "/.")
 	print $0
-}'                   |
-tr '\n' '\0'         |
-xargs -0 -n1 dirname |
-grep -v "$HOME$"     |
-uniq                 |
-tr '\n' '\0'         |
-xargs -0 mkdir -p
+}' |
+	tr '\n' '\0' |
+	xargs -0 -n1 dirname |
+	grep -v "$HOME$" |
+	uniq |
+	tr '\n' '\0' |
+	xargs -0 mkdir -p
 
 IFS='
 '
@@ -80,12 +80,11 @@ IFS='
 dialog() {
 	ln -insv "$target" "$link_name"
 	[ "$target" = "$(readlink "$link_name")" ] || {
-		echo "$dot" >> "$DOTFILES_IGNOREFILE"
+		echo "$dot" >>"$DOTFILES_IGNOREFILE"
 	}
 }
 
-for dot in $dots
-do
+for dot in $dots; do
 	target="$DOTFILES_DIR/$dot"
 	link_name="$HOME/.$dot"
 	entity=$(readlink "$link_name")
@@ -101,5 +100,5 @@ do
 		continue
 	}
 	[ -d "$link_name" ] && continue # not yet linked but dir already exists
-	ln -nsv "$target" "$link_name" # not yet linked and no exists
+	ln -nsv "$target" "$link_name"  # not yet linked and no exists
 done
