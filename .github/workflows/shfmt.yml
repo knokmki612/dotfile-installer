@@ -4,16 +4,26 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   shfmt:
-    name: Check shell script formatting
+    name: Format shell scripts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
-      - name: Run shfmt
+      - name: Setup shfmt
         uses: mfinelli/setup-shfmt@v3
 
-      - name: Check formatting
-        run: shfmt -d install.sh
+      - name: Run shfmt
+        run: shfmt -w install.sh
+
+      - name: Commit formatting changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply shfmt formatting
