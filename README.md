@@ -65,6 +65,7 @@ $ yes | ./install.sh
 
 ## Releasing
 
-Bump `VERSION` in `install.sh`, then push a tag with the same version (e.g.
-`1.3.0`). The Release workflow verifies the version and publishes the
-release asset.
+Bump `VERSION` in `install.sh`, then push a `v`-prefixed tag with the same
+version (e.g. `v1.3.0` for `VERSION='1.3.0'`). The Release workflow verifies
+the version and publishes the release asset. (Tags up to `1.2.0` were not
+prefixed.)
