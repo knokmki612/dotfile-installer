@@ -33,7 +33,18 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # actions/checkout stores annotated tags as lightweight ones; fetch
+          # the tag object to read its message.
+          git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
+          if [ "$(git cat-file -t "$GITHUB_REF_NAME")" = tag ]; then
+            git tag --list --format='%(contents:body)' "$GITHUB_REF_NAME" >notes.md
+          fi
+          if [ -s notes.md ]; then
+            set -- --notes-file notes.md
+          else
+            set -- --generate-notes
+          fi
           gh release create "$GITHUB_REF_NAME" dist/dotfile-installer \
             --repo "$GITHUB_REPOSITORY" \
             --title "$GITHUB_REF_NAME" \
-            --generate-notes
+            "$@"
