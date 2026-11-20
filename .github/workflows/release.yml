@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check version matches tag
+        run: |
+          version=$(sh install.sh --version)
+          if [ "$version" != "dotfile-installer ${GITHUB_REF_NAME}" ]; then
+            echo "install.sh reports '${version}' but the tag is ${GITHUB_REF_NAME}" >&2
+            exit 1
+          fi
+
+      - name: Build asset
+        run: |
+          mkdir dist
+          cp install.sh dist/dotfile-installer
+          chmod +x dist/dotfile-installer
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/dotfile-installer \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes

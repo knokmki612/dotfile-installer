@@ -2,7 +2,7 @@
 
 ## What's this?
 
-dotfile-installer helps your dotfiles management. This software focuses no learning cost is required to start using and there is no need to write the setting. All you need is just exec `./install.sh`.
+dotfile-installer helps your dotfiles management. This software focuses no learning cost is required to start using and there is no need to write the setting. All you need is just exec `./install.sh` (or `dotfile-installer`).
 
 Example dotfiles repository: https://github.com/knokmki612/dotfiles
 
@@ -16,12 +16,42 @@ Example dotfiles repository: https://github.com/knokmki612/dotfiles
 
 ## Installation & Usage
 
+### As a standalone tool (via mise)
+
+Every tagged version is published as a GitHub Release with a single
+`dotfile-installer` executable, so [mise](https://mise.jdx.dev/) can install it:
+
+```
+$ cd dotfiles
+$ mise exec github:knokmki612/dotfile-installer -- dotfile-installer
+```
+
+Or pin it in your mise config:
+
+```toml
+[tools]
+"github:knokmki612/dotfile-installer" = "latest"
+```
+
+Without arguments `dotfile-installer` uses the current directory, which must
+be the root of a git repository. You can also pass the dotfiles directory
+explicitly: `dotfile-installer ~/dotfiles`.
+
+The script has no dependencies besides a POSIX shell, so you can also just
+download `install.sh` and run `sh install.sh ~/dotfiles`.
+
+### As a git submodule
+
 ```
 $ cd dotfiles
 $ git submodule add https://github.com/knokmki612/dotfile-installer.git
 $ ln -s dotfile-installer/install.sh .
 $ ./install.sh
 ```
+
+When the dotfiles repository contains dotfile-installer as a submodule (with
+the `install.sh` symlink), both the submodule and the symlink are skipped,
+whichever way the installer is invoked.
 
 ## FAQ
 
@@ -32,3 +62,9 @@ You can use yes command.
 ```
 $ yes | ./install.sh
 ```
+
+## Releasing
+
+Bump `VERSION` in `install.sh`, then push a tag with the same version (e.g.
+`1.3.0`). The Release workflow verifies the version and publishes the
+release asset.
